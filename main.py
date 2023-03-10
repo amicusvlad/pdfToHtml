@@ -20,7 +20,3 @@ html = emptyLineBreaksRemoving(html)
 html = pTagsMerging(html)
 html = dialogues(html)
 fileSaving(destFile, html)
-
-# print(html)
-
-# —

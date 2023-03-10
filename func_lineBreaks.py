@@ -1,5 +1,3 @@
-from bs4 import BeautifulSoup
-
 def emptyLineBreaksRemoving(html):
     try:
         # разбиваем текст на строки
