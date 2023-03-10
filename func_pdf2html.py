@@ -20,4 +20,5 @@ def pdf2html(pdfName):
         html = BeautifulSoup(f, "html.parser")
 
     os.remove('example.html')
+
     return str(html)
