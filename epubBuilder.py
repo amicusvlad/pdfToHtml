@@ -1,38 +1,48 @@
 from ebooklib import epub
 from bs4 import BeautifulSoup
 
-# Открываем HTML-файл и парсим его с помощью BeautifulSoup
-with open('example.html', 'r') as file:
-    html = file.read()
-    soup = BeautifulSoup(html, 'html.parser')
+# Read the HTML file
+with open('file.html', 'r', encoding='utf-8') as file:
+    html_content = file.read()
 
-# Создаем объект книги и задаем метаданные
+# Create a new EPUB book
 book = epub.EpubBook()
-book.set_identifier('id123456')
+
+# Set the book metadata
 book.set_title('Гарри Поттер и Кубок огня')
 book.set_language('ru')
 book.add_author('Дж. К. Ролинг')
-book.set_cover('image.jpg', open('image.jpg', 'rb').read(), 'image/jpeg')
 book.add_metadata('DC', 'series', 'Гарри Поттер')
 book.add_metadata('DC', 'series_index', '4')
 book.add_metadata('DC', 'publisher', 'РОСМЭН')
 
-# Создаем оглавление из заголовков h2
-toc = []
-for tag in soup.find_all('h2'):
-    chapter = epub.EpubHtml(title=tag.text, file_name='chapter{}.xhtml'.format(len(toc) + 1), lang='ru')
-    chapter.set_content(str(tag))
+# Add the book cover
+book.set_cover('image.jpg', open('image.jpg', 'rb').read())
+
+# Parse the HTML content
+soup = BeautifulSoup(html_content, 'html.parser')
+headers = soup.find_all('h2')
+paragraphs = soup.find_all('p')
+
+# Add the table of contents
+toc = epub.EpubNav()
+book.add_item(toc)
+toc_item = epub.EpubNavItem('Оглавление', 'toc.xhtml', [])
+toc.item.append(toc_item)
+for header in headers:
+    title = header.get_text()
+    chapter_id = 'chapter-' + str(headers.index(header) + 1)
+    chapter_link = chapter_id + '.xhtml'
+    chapter = epub.EpubHtml(title=title, file_name=chapter_link, lang='ru')
+    chapter.content = str(header) + str(header.find_next('p'))
     book.add_item(chapter)
-    toc.append(chapter)
+    toc_item.sub_items.append(epub.EpubNavItem(title, chapter_link, []))
 
-# Устанавливаем оглавление
-book.toc = tuple(toc)
+# Add the book spine
+book.spine = ['nav']
+book.spine += [chapter] for chapter in book.items[1:]
 
-# Создаем файл книги
-book.add_item(epub.EpubNcx())
-book.add_item(epub.EpubNav())
-
-# Создаем контейнер и добавляем книгу в него
-book.spine = toc
-book.epub_version = '3.0'
+# Save the EPUB file
 epub.write_epub('book.epub', book, {})
+
+
