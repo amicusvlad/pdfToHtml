@@ -1,19 +1,21 @@
-import ebooklib
+# title = 'Гарри Поттер и Кубок огня'
+# book.set_title(title)
+# book.set_language('ru')
+# book.add_author('Дж. К. Ролинг')
+# book.add_metadata('DC', 'series', 'Гарри Поттер')
+# book.add_metadata('DC', 'series_index', '4')
+# book.add_metadata('DC', 'publisher', 'РОСМЭН')
+# book.set_cover('image.jpg', open('image.jpg', 'rb').read())
+
+import os
 from ebooklib import epub
 from bs4 import BeautifulSoup
+import uuid
 
-# загрузка исходного HTML файла
-with open('example.html', 'r', encoding='utf-8') as f:
-    html = f.read()
 
-# парсинг HTML
-soup = BeautifulSoup(html, 'html.parser')
-
-# создание объекта книги
 book = epub.EpubBook()
-
-# установка метаданных
-book.set_title('Гарри Поттер и Кубок огня')
+title = 'Гарри Поттер и Кубок огня'
+book.set_title(title)
 book.set_language('ru')
 book.add_author('Дж. К. Ролинг')
 book.add_metadata('DC', 'series', 'Гарри Поттер')
@@ -21,20 +23,34 @@ book.add_metadata('DC', 'series_index', '4')
 book.add_metadata('DC', 'publisher', 'РОСМЭН')
 book.set_cover('image.jpg', open('image.jpg', 'rb').read())
 
-# создание оглавления
-toc = []
-for h2 in soup.find_all('h2'):
-    toc.append(epub.Link(h2['id'], h2.text, h2['id']))
-book.toc = toc
-book.add_item(epub.EpubNcx())
-book.add_item(epub.EpubNav())
 
-# создание контента
-content = epub.EpubHtml(title='Содержание', file_name='content.xhtml', lang='ru')
-content.content = str(soup.find('body'))
+with open('example.html') as file:
+    soup = BeautifulSoup(file.read(), 'html.parser')
 
-# добавление контента в книгу
-book.add_item(content)
+# Найти все теги h2 и добавить к ним уникальный id
+for chapter in soup.find_all('h2'):
+    chapter['id'] = str(uuid.uuid4())
 
-# упаковка книги в epub-файл
+# Теперь можно использовать созданные id вместо текстовых заголовков для создания оглавления:
+chapter_list = soup.find_all('h2')
+
+# Создайте объект epub-оглавления
+epub_toc = epub.EpubNav()
+epub_toc.add_item(epub.EpubNav())
+
+# Добавьте каждый заголовок в оглавление и создайте новую главу для каждого заголовка
+for chapter in chapter_list:
+    chapter_title = chapter.text
+    chapter_id = chapter['id']
+    chapter_content = str(chapter) + str(chapter.find_next_sibling())
+    c = epub.EpubHtml(title=chapter_title, file_name='chapter_{}.xhtml'.format(chapter_id), lang='hr')
+    c.content = chapter_content
+    book.add_item(c)
+    epub_toc.add_nav_point(epub.NavPoint(chapter_title, 'chapter_{}.xhtml'.format(chapter_id), []))
+
+# Добавьте epub-оглавление в книгу
+book.add_item(epub_toc)
+book.toc = epub_toc
+book.spine.append(epub_toc)
+
 epub.write_epub('book.epub', book, {})
