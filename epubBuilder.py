@@ -24,7 +24,7 @@ book.add_metadata('DC', 'series_index', '4')
 book.add_metadata('DC', 'publisher', 'РОСМЭН')
 
 # Add the book cover
-book.set_cover('image.jpg', open('cover.jpg', 'rb').read())
+book.set_cover('image.jpg', open('image.jpg', 'rb').read())
 
 # Parse the HTML content
 soup = BeautifulSoup(html_content, 'html.parser')
