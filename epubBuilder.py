@@ -40,7 +40,7 @@ for header in headers:
 
 # Add the book spine
 book.spine = ['nav']
-book.spine += [chapter] for chapter in book.items[1:]
+book.spine += [chapter for chapter in book.items[1:]]
 
 # Save the EPUB file
 epub.write_epub('book.epub', book, {})
