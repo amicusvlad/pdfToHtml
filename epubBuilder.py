@@ -1,57 +1,40 @@
-# book.set_title('Гарри Поттер и Кубок огня')
-# book.set_language('ru')
-# book.add_author('Дж. К. Ролинг')
-# book.add_metadata('DC', 'series', 'Гарри Поттер')
-# book.add_metadata('DC', 'series_index', '4')
-# book.add_metadata('DC', 'publisher', 'РОСМЭН')
-
+import ebooklib
 from ebooklib import epub
 from bs4 import BeautifulSoup
 
-# Read the HTML file
-with open('example.html', 'r', encoding='utf-8') as file:
-    html_content = file.read()
+# загрузка исходного HTML файла
+with open('example.html', 'r', encoding='utf-8') as f:
+    html = f.read()
 
-# Create a new EPUB book
+# парсинг HTML
+soup = BeautifulSoup(html, 'html.parser')
+
+# создание объекта книги
 book = epub.EpubBook()
 
-# Set the book metadata
+# установка метаданных
 book.set_title('Гарри Поттер и Кубок огня')
 book.set_language('ru')
 book.add_author('Дж. К. Ролинг')
 book.add_metadata('DC', 'series', 'Гарри Поттер')
 book.add_metadata('DC', 'series_index', '4')
 book.add_metadata('DC', 'publisher', 'РОСМЭН')
-
-# Add the book cover
 book.set_cover('image.jpg', open('image.jpg', 'rb').read())
 
-# Parse the HTML content
-soup = BeautifulSoup(html_content, 'html.parser')
-headers = soup.find_all('h2')
-paragraphs = soup.find_all('p')
+# создание оглавления
+toc = []
+for h2 in soup.find_all('h2'):
+    toc.append(epub.Link(h2['id'], h2.text, h2['id']))
+book.toc = toc
+book.add_item(epub.EpubNcx())
+book.add_item(epub.EpubNav())
 
-# Add the table of contents
-toc = epub.EpubNcx()
-book.add_item(toc)
-toc_item = epub.EpubNavPoint('Оглавление', 'toc.xhtml', [])
-toc.item.append(toc_item)
-for header in headers:
-    title = header.get_text()
-    chapter_id = 'chapter-' + str(headers.index(header) + 1)
-    chapter_link = chapter_id + '.xhtml'
-    chapter = epub.EpubHtml(title=title, file_name=chapter_link, lang='ru')
-    chapter.content = str(header) + str(header.find_next('p'))
-    book.add_item(chapter)
-    toc_item.sub_items.append(epub.EpubNavPoint(title, chapter_link, chapter))
+# создание контента
+content = epub.EpubHtml(title='Содержание', file_name='content.xhtml', lang='ru')
+content.content = str(soup.find('body'))
 
-# Add the book spine
-book.spine = ['nav']
-book.spine += [chapter for chapter in book.items[1:]]
+# добавление контента в книгу
+book.add_item(content)
 
-# Save the EPUB file
+# упаковка книги в epub-файл
 epub.write_epub('book.epub', book, {})
-
-
-
-

@@ -8,7 +8,7 @@ def headers(text):
             # Если строка начинается со слова "Глава"
             if lines[i].startswith("<p>Глава"):
                 # Превращаем строку в заголовок
-                lines[i] = lines[i].replace("<p>", "<h2>")
+                lines[i] = lines[i].replace("<p>", "<h2 id='header'>")
                 lines[i] = lines[i].replace("</p>", "</h2>")
 
         # Объединяем строки обратно в текст
