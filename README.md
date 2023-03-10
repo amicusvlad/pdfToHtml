@@ -6,5 +6,5 @@
 Использовал сторонние библиотеки: 
 * BeautifulSoup - для работы с html
 * fitz - для работы с pdf
+* EbookLib - для конвертации в epub
 
-Можно подключить https://github.com/aerkalov/ebooklib и формировать epub автоматически
