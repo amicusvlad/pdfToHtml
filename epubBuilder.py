@@ -2,7 +2,7 @@ from ebooklib import epub
 from bs4 import BeautifulSoup
 
 # Read the HTML file
-with open('file.html', 'r', encoding='utf-8') as file:
+with open('example.html', 'r', encoding='utf-8') as file:
     html_content = file.read()
 
 # Create a new EPUB book
