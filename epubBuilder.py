@@ -34,7 +34,7 @@ paragraphs = soup.find_all('p')
 # Add the table of contents
 toc = epub.EpubNcx()
 book.add_item(toc)
-toc_item = epub.EpubNavItem('Оглавление', 'toc.xhtml', [])
+toc_item = epub.EpubNavPoint('Оглавление', 'toc.xhtml', [])
 toc.item.append(toc_item)
 for header in headers:
     title = header.get_text()
@@ -51,6 +51,7 @@ book.spine += [chapter for chapter in book.items[1:]]
 
 # Save the EPUB file
 epub.write_epub('book.epub', book, {})
+
 
 
 
