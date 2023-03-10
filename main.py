@@ -5,6 +5,7 @@ from func_lineBreaks import *
 from func_saving import *
 from func_ptags import *
 from func_dialogues import *
+from func_headers import *
 
 for root, dirs, files in os.walk(os.getcwd()):
         for file in files:
@@ -17,4 +18,5 @@ html = tagCleaning(html)
 html = emptyLineBreaksRemoving(html)
 html = pTagsMerging(html)
 html = dialogues(html)
+html = headers(html)
 fileSaving(destFile, html)
