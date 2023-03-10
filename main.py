@@ -10,8 +10,6 @@ for root, dirs, files in os.walk(os.getcwd()):
         for file in files:
             if file.endswith(".pdf"):
                 pdfName = os.path.join(file)
-# pdfName = path_file
-# pdfName = '1.Гарри_Поттер_и_философский_камень.pdf'
 destFile = pdfName.rstrip('pdf')+'html'
 
 html = pdf2html(pdfName)
